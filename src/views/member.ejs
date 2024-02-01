@@ -1,0 +1,19 @@
+<%- include("templates/header", {scripts:
+["https://code.jquery.com/jquery-3.6.3.js","/script.js"]}) %>
+<h1>
+  Hello <%- username %> <% if (user_type=='admin' ) { %> <%= " (admin)" %> <% }
+  %>!
+</h1>
+<div>
+  <img src="/<%= cat_number %>.png" />
+</div>
+<div>
+  <button onClick="fetch('/getMyId')
+                .then(response => response.json())
+                .then(data => console.log(data))
+                .catch(error => console.error('Error:', error))" </button>>Get my user id!</button>
+</Div>
+<div>
+  <a href="signout"><button>Signout</button></a>
+</div>
+<%- include("templates/footer") %>
