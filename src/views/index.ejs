@@ -1,6 +1,10 @@
-<%- include("templates/header") %> 
-    <h1>Hello World!</h1>
-    <a href="createUser"><button>Sign Up</button></a>
-    <a href="login"><button>Log in</button></a>
+<%- include("templates/header") %>
+<h1>Hello World!</h1>
 
-<%- include("templates/footer") %> 
+<% if (!authenticated) { %>
+<a href="createUser"><button>Sign Up</button></a>
+<a href="login"><button>Log in</button></a>
+<% } else { %>
+<a href="member"><button>Members Area</button></a>
+<a href="signout"><button>Signout</button></a>
+<% } %> <%- include("templates/footer") %>

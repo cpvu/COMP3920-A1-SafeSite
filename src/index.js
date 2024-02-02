@@ -49,7 +49,7 @@ app.use(
 );
 
 app.get("/", (req, res) => {
-  res.render("index");
+  res.render("index", { authenticated: req.session.authenticated });
 });
 
 app.get("/about", (req, res) => {
@@ -123,7 +123,9 @@ app.post("/submitUser", async (req, res) => {
   if (success) {
     var results = await db_users.getUsers();
 
-    res.render("login", { user: JSON.stringify(results) });
+    var recentUserName = results[results.length - 1].username;
+
+    res.render("login", { user: JSON.stringify(recentUserName) });
   }
 
   // else {
@@ -140,6 +142,8 @@ app.post("/loggingin", async (req, res) => {
     hashedPassword: password,
   });
 
+  console.log(results);
+
   if (results) {
     if (results.length == 1) {
       //there should only be 1 user in the db that matches
@@ -149,7 +153,7 @@ app.post("/loggingin", async (req, res) => {
         req.session.username = username;
         req.session.cookie.maxAge = expireTime;
 
-        res.redirect("/member");
+        res.redirect(`/member`);
         return;
       } else {
         console.log("invalid password");
