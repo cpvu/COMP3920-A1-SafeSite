@@ -1,0 +1,188 @@
+<%- include("../templates/header") %>
+
+<div style="margin: 10px; width: 100%">
+    <div><h1>Chatroom:</h1></div>
+    <div style="width: 80%">
+        <button id="inviteButton" style="cursor: pointer">Invite People</button>
+
+        <div
+            id="inviteModal"
+            class="modal"
+            style="
+                display: none;
+                position: fixed;
+                z-index: 1;
+                left: 0;
+                top: 0;
+                width: 100%;
+                height: 100%;
+                overflow: auto;
+                background-color: rgba(0, 0, 0, 0.4);
+            "
+        >
+            <div
+                class="modal-content"
+                style="
+                    background-color: #fefefe;
+                    margin: 15% auto;
+                    padding: 20px;
+                    border: 1px solid #888;
+                    width: 50%;
+                "
+            >
+                <span
+                    class="close"
+                    style="
+                        color: #aaa;
+                        float: right;
+                        font-size: 28px;
+                        font-weight: bold;
+                        cursor: pointer;
+                    "
+                    onclick="document.getElementById('inviteModal').style.display='none'"
+                    >&times;</span
+                >
+                <h2>Select Members to Invite</h2>
+                <ul id="memberList" style="list-style: none; padding: 0">
+                    <% membersInRoom.forEach(function(member) { %>
+                    <li>
+                        <label style="display: block; margin: 10px 0">
+                            <input
+                                type="checkbox"
+                                class="member-checkbox"
+                                disabled
+                                value="<%= member.username %>"
+                            />
+                            <%= member.username %>
+                        </label>
+                    </li>
+                    <% }); %> <% membersToInvite.forEach(function(member) { %>
+                    <li>
+                        <label style="display: block; margin: 10px 0">
+                            <input
+                                type="checkbox"
+                                class="member-checkbox"
+                                value="<%= member.username %>"
+                            />
+                            <%= member.username %> (Invite to Group)
+                        </label>
+                    </li>
+                    <% }); %>
+                </ul>
+                <button id="sendInvite" style="cursor: pointer">Invite</button>
+            </div>
+        </div>
+
+        <div class="card" style="width: 65rem; height: 50rem; overflow-y: auto">
+            <div
+                class="messages-container"
+                style="
+                    padding: 10px;
+                    border: 1px solid #ccc;
+                    border-radius: 8px;
+                    margin-bottom: 10px;
+                    overflow-y: auto;
+                    width: 100%;
+                "
+            >
+                <% messages.forEach((message, index) => { %>
+                <div
+                    style="margin-bottom: 10px; margin-top: 10px; padding: 12px; border-radius: 8px; max-width: 80%; clear: both; background-color: <%= message.user_id === currentUserID ? '#dcf8c6' : '#ececec' %>; <%= message.user_id === currentUserID ? 'margin-left: auto;' : 'margin-right: auto;' %>;"
+                >
+                    <strong><%= message.username %></strong>
+                    <p><%= message.text %></p>
+                    <small
+                        ><%= new
+                        Date(message.sent_datetime).toLocaleTimeString()
+                        %></small
+                    >
+                    <% let emojiCounts = [message.thumbemoji,
+                    message.hundredemoji, message.happyemoji]; %>
+
+                    <div style="margin-top: 10px">
+                        <% emojis.forEach((emoji, index) => { %>
+                        <button
+                            type="button"
+                            class="btn btn-light emoji-button"
+                            onclick="emojiClicked('<%=emoji.emoji_id%>', '<%= emoji.name %>', '<%= message.message_id %>', '<%= currentUserID %>')"
+                            style="margin-right: 5px"
+                        >
+                            <img
+                                src="/<%= emoji.image %>"
+                                alt="<%= emoji.name %>"
+                                style="width: 20px; height: 20px"
+                            />
+                            <%= emoji.count ? emoji.count : emojiCounts[index]
+                            %>
+                        </button>
+                        <% }); %>
+                    </div>
+                </div>
+                <% }); %>
+            </div>
+        </div>
+
+        <div>
+            <label>Enter a message:</label>
+            <input type="text" />
+        </div>
+    </div>
+</div>
+
+<script>
+    function emojiClicked(emojiID, emojiName, messageID, userID) {
+        window.location.reload();
+
+        fetch("/api/messageReactEmoji", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                emojiID: emojiID,
+                emojiName: emojiName,
+                messageID: messageID,
+                userID: userID,
+            }),
+        })
+            .then((response) => response.json())
+            .then((data) => {
+                console.log("Success:", data);
+                document.getElementById("inviteModal").style.display = "none";
+            })
+            .catch((error) => {
+                console.error("Error:", error);
+            });
+    }
+
+    document.getElementById("inviteButton").onclick = function () {
+        document.getElementById("inviteModal").style.display = "block";
+    };
+
+    document.getElementById("sendInvite").onclick = function () {
+        const roomID = "<%= roomID %>";
+        let selectedMemberIds = [];
+        document
+            .querySelectorAll(".member-checkbox:checked")
+            .forEach(function (checkbox) {
+                selectedMemberIds.push(checkbox.value);
+            });
+
+        fetch("/api/inviteNewMember", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                roomID: roomID,
+                members: selectedMemberIds,
+            }),
+        })
+            .then((response) => response.json())
+            .then((data) => {
+                console.log("Success:", data);
+                document.getElementById("inviteModal").style.display = "none";
+            })
+            .catch((error) => {
+                console.error("Error:", error);
+            });
+    };
+</script>
+
+<%- include("../templates/footer") %>
