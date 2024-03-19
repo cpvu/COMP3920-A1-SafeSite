@@ -92,10 +92,9 @@
             .then((response) => response.json())
             .then((data) => {
                 console.log("Success:", data);
-                // Close the modal and potentially refresh the page or update the UI to show the new room
+
                 document.getElementById("createRoomModal").style.display =
                     "none";
-                // Optional: Refresh the page or add the new room to the UI
             })
             .catch((error) => {
                 console.error("Error:", error);
