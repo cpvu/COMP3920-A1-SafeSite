@@ -20,6 +20,7 @@ const postUser = async (req, res) => {
     if (error) {
         console.log(error.details[0].message);
         res.redirect(`/signup?error=${error.details[0].message}`);
+        return;
     } else {
         console.log("Password is valid.");
     }

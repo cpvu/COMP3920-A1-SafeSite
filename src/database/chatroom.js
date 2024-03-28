@@ -303,7 +303,7 @@ async function createNewRoom(postData) {
         const params = {
             userID: postData.userID,
             roomName: postData.roomName,
-            currentDate: Date.toISOString(),
+            currentDate: new Date().toISOString(),
         };
 
         const createNewRoomQuery = `INSERT INTO room (name, start_datetime)
@@ -311,11 +311,11 @@ async function createNewRoom(postData) {
 
         const [results, fields] = await db.query(createNewRoomQuery, params);
 
-        const addUserToNewRoom = `INSERT INTO room_user(user_id, room_id, last_unread_message_id) 
+        const addUserToNewRoom = `INSERT INTO room_user(user_id, room_id, last_read_message_id) 
         VALUES(:userID, (SELECT room_id FROM room WHERE name = :roomName), (SELECT MAX(message_id) FROM message) )`;
 
         const [addUserResults, addUserfields] = await db.query(
-            createNewRoomQuery,
+            addUserToNewRoom,
             params
         );
 

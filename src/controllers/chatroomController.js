@@ -40,8 +40,8 @@ const getRooms = async (req, res) => {
     const userrooms = await dbChatroom.getRooms(userID);
 
     let roomInfo = [];
-    console.log(userID);
-    console.log(userrooms);
+
+    if (!userrooms) return;
 
     for (const room of userrooms) {
         let [roomDetails, roomFields] = await dbChatroom.getRoom({

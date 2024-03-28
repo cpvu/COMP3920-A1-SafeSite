@@ -11,7 +11,9 @@ function convertDate(date) {
         differenceInMilliseconds / (1000 * 60 * 60 * 24)
     );
 
-    if (differenceInDays === 0) {
+    if (!date) {
+        return "N/A";
+    } else if (differenceInDays === 0) {
         return "Today";
     } else if (differenceInDays === 1) {
         return "Yesterday";
